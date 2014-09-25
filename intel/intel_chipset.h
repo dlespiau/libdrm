@@ -181,16 +181,6 @@
 #define PCI_CHIP_SKYLAKE_SRV_GT1	0x190A
 #define PCI_CHIP_SKYLAKE_WKS_GT2 	0x191D
 
-#define IS_MOBILE(devid)	((devid) == PCI_CHIP_I855_GM || \
-				 (devid) == PCI_CHIP_I915_GM || \
-				 (devid) == PCI_CHIP_I945_GM || \
-				 (devid) == PCI_CHIP_I945_GME || \
-				 (devid) == PCI_CHIP_I965_GM || \
-				 (devid) == PCI_CHIP_I965_GME || \
-				 (devid) == PCI_CHIP_GM45_GM || IS_IGD(devid) || \
-				 (devid) == PCI_CHIP_IVYBRIDGE_M_GT1 || \
-				 (devid) == PCI_CHIP_IVYBRIDGE_M_GT2)
-
 #define IS_G45(devid)		((devid) == PCI_CHIP_IGD_E_G || \
 				 (devid) == PCI_CHIP_Q45_G || \
 				 (devid) == PCI_CHIP_G45_G || \

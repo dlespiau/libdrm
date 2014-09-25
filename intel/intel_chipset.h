@@ -165,16 +165,6 @@
 #define PCI_CHIP_CHERRYVIEW_2		0x22b2
 #define PCI_CHIP_CHERRYVIEW_3		0x22b3
 
-#define IS_MOBILE(devid)	((devid) == PCI_CHIP_I855_GM || \
-				 (devid) == PCI_CHIP_I915_GM || \
-				 (devid) == PCI_CHIP_I945_GM || \
-				 (devid) == PCI_CHIP_I945_GME || \
-				 (devid) == PCI_CHIP_I965_GM || \
-				 (devid) == PCI_CHIP_I965_GME || \
-				 (devid) == PCI_CHIP_GM45_GM || IS_IGD(devid) || \
-				 (devid) == PCI_CHIP_IVYBRIDGE_M_GT1 || \
-				 (devid) == PCI_CHIP_IVYBRIDGE_M_GT2)
-
 #define IS_G45(devid)		((devid) == PCI_CHIP_IGD_E_G || \
 				 (devid) == PCI_CHIP_Q45_G || \
 				 (devid) == PCI_CHIP_G45_G || \

@@ -60,6 +60,7 @@
 #include "libdrm_lists.h"
 #include "intel_bufmgr.h"
 #include "intel_bufmgr_priv.h"
+#include "intel_device.h"
 #include "intel_chipset.h"
 #include "intel_aub.h"
 #include "string.h"
@@ -120,6 +121,7 @@ typedef struct _drm_intel_bufmgr_gem {
 
 	uint64_t gtt_size;
 	int available_fences;
+	struct drm_intel_device *dev;
 	int pci_device;
 	int gen;
 	unsigned int has_bsd : 1;
@@ -1763,6 +1765,7 @@ drm_intel_bufmgr_gem_destroy(drm_intel_bufmgr *bufmgr)
 		}
 	}
 
+	drm_intel_device_free(bufmgr_gem->dev);
 	free(bufmgr);
 }
 
@@ -3071,37 +3074,6 @@ drm_intel_bufmgr_gem_set_vma_cache_size(drm_intel_bufmgr *bufmgr, int limit)
 	drm_intel_gem_bo_purge_vma_cache(bufmgr_gem);
 }
 
-/**
- * Get the PCI ID for the device.  This can be overridden by setting the
- * INTEL_DEVID_OVERRIDE environment variable to the desired ID.
- */
-static int
-get_pci_device_id(drm_intel_bufmgr_gem *bufmgr_gem)
-{
-	char *devid_override;
-	int devid = 0;
-	int ret;
-	drm_i915_getparam_t gp;
-
-	if (geteuid() == getuid()) {
-		devid_override = getenv("INTEL_DEVID_OVERRIDE");
-		if (devid_override) {
-			bufmgr_gem->no_exec = true;
-			return strtod(devid_override, NULL);
-		}
-	}
-
-	memclear(gp);
-	gp.param = I915_PARAM_CHIPSET_ID;
-	gp.value = &devid;
-	ret = drmIoctl(bufmgr_gem->fd, DRM_IOCTL_I915_GETPARAM, &gp);
-	if (ret) {
-		fprintf(stderr, "get chip id failed: %d [%d]\n", ret, errno);
-		fprintf(stderr, "param: %d, val: %d\n", gp.param, *gp.value);
-	}
-	return devid;
-}
-
 drm_public int
 drm_intel_bufmgr_gem_get_devid(drm_intel_bufmgr *bufmgr)
 {
@@ -3469,29 +3441,15 @@ drm_intel_bufmgr_gem_init(int fd, int batch_size)
 			(int)bufmgr_gem->gtt_size / 1024);
 	}
 
-	bufmgr_gem->pci_device = get_pci_device_id(bufmgr_gem);
-
-	if (IS_GEN2(bufmgr_gem->pci_device))
-		bufmgr_gem->gen = 2;
-	else if (IS_GEN3(bufmgr_gem->pci_device))
-		bufmgr_gem->gen = 3;
-	else if (IS_GEN4(bufmgr_gem->pci_device))
-		bufmgr_gem->gen = 4;
-	else if (IS_GEN5(bufmgr_gem->pci_device))
-		bufmgr_gem->gen = 5;
-	else if (IS_GEN6(bufmgr_gem->pci_device))
-		bufmgr_gem->gen = 6;
-	else if (IS_GEN7(bufmgr_gem->pci_device))
-		bufmgr_gem->gen = 7;
-	else if (IS_GEN8(bufmgr_gem->pci_device))
-		bufmgr_gem->gen = 8;
-	else if (IS_GEN9(bufmgr_gem->pci_device))
-		bufmgr_gem->gen = 9;
-	else {
+	bufmgr_gem->dev = drm_intel_device_new(fd);
+	if (bufmgr_gem->dev == NULL) {
 		free(bufmgr_gem);
 		bufmgr_gem = NULL;
 		goto exit;
 	}
+
+	bufmgr_gem->pci_device = drm_intel_device_get_devid(bufmgr_gem->dev);
+	bufmgr_gem->gen = bufmgr_gem->dev->gen;
 
 	if (IS_GEN3(bufmgr_gem->pci_device) &&
 	    bufmgr_gem->gtt_size > 256*1024*1024) {

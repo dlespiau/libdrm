@@ -3494,8 +3494,8 @@ drm_intel_bufmgr_gem_init(int fd, int batch_size)
 		/* Kernel does not supports HAS_LLC query, fallback to GPU
 		 * generation detection and assume that we have LLC on GEN6/7
 		 */
-		bufmgr_gem->has_llc = (IS_GEN6(bufmgr_gem->pci_device) |
-				IS_GEN7(bufmgr_gem->pci_device));
+		bufmgr_gem->has_llc = IS_GEN6(bufmgr_gem->pci_device) ||
+				      IS_GEN7(bufmgr_gem->pci_device);
 	} else
 		bufmgr_gem->has_llc = *gp.value;
 

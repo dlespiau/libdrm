@@ -36,7 +36,6 @@
 #include "libdrm.h"
 #include "xf86drm.h"
 #include "intel_device_priv.h"
-#include "intel_chipset.h"
 #include "intel_bufmgr.h"
 
 /* Struct for tracking drm_intel_decode state. */

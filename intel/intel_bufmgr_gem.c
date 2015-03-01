@@ -61,7 +61,6 @@
 #include "intel_bufmgr.h"
 #include "intel_bufmgr_priv.h"
 #include "intel_device_priv.h"
-#include "intel_chipset.h"
 #include "intel_aub.h"
 #include "string.h"
 

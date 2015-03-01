@@ -36,7 +36,6 @@
 
 #include "libdrm.h"
 #include "intel_bufmgr.h"
-#include "intel_chipset.h"
 
 #define HW_OFFSET 0x12300000
 
@@ -147,9 +146,9 @@ infer_devid(const char *batch_filename)
 		{ "945",  0x2772},
 		{ "gen4", 0x2a02 },
 		{ "gm45", 0x2a42 },
-		{ "gen5", PCI_CHIP_ILD_G },
-		{ "gen6", PCI_CHIP_SANDYBRIDGE_GT2 },
-		{ "gen7", PCI_CHIP_IVYBRIDGE_GT2 },
+		{ "gen5", 0x0042 },
+		{ "gen6", 0x0112 },
+		{ "gen7", 0x0162 },
 		{ "gen8", 0x1616 },
 		{ NULL, 0 },
 	};

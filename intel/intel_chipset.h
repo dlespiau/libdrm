@@ -181,13 +181,6 @@
 #define PCI_CHIP_SKYLAKE_SRV_GT1	0x190A
 #define PCI_CHIP_SKYLAKE_WKS_GT2 	0x191D
 
-#define IS_G45(devid)		((devid) == PCI_CHIP_IGD_E_G || \
-				 (devid) == PCI_CHIP_Q45_G || \
-				 (devid) == PCI_CHIP_G45_G || \
-				 (devid) == PCI_CHIP_G41_G)
-#define IS_GM45(devid)		((devid) == PCI_CHIP_GM45_GM)
-#define IS_G4X(devid)		(IS_G45(devid) || IS_GM45(devid))
-
 #define IS_ILD(devid)		((devid) == PCI_CHIP_ILD_G)
 #define IS_ILM(devid)		((devid) == PCI_CHIP_ILM_G)
 
@@ -213,14 +206,6 @@
 				 (devid) == PCI_CHIP_I865_G)
 
 #define IS_GEN3(devid)		(IS_945(devid) || IS_915(devid))
-
-#define IS_GEN4(devid)		((devid) == PCI_CHIP_I965_G || \
-				 (devid) == PCI_CHIP_I965_Q || \
-				 (devid) == PCI_CHIP_I965_G_1 || \
-				 (devid) == PCI_CHIP_I965_GM || \
-				 (devid) == PCI_CHIP_I965_GME || \
-				 (devid) == PCI_CHIP_I946_GZ || \
-				 IS_G4X(devid))
 
 #define IS_GEN5(devid)		(IS_ILD(devid) || IS_ILM(devid))
 

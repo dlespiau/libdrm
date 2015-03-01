@@ -3451,8 +3451,7 @@ drm_intel_bufmgr_gem_init(int fd, int batch_size)
 	bufmgr_gem->pci_device = drm_intel_device_get_devid(bufmgr_gem->dev);
 	bufmgr_gem->gen = bufmgr_gem->dev->gen;
 
-	if (IS_GEN3(bufmgr_gem->pci_device) &&
-	    bufmgr_gem->gtt_size > 256*1024*1024) {
+	if (IS_GEN3(bufmgr_gem->dev) && bufmgr_gem->gtt_size > 256*1024*1024) {
 		/* The unmappable part of gtt on gen 3 (i.e. above 256MB) can't
 		 * be used for tiled blits. To simplify the accounting, just
 		 * substract the unmappable part (fixed to 256MB on all known
@@ -3494,8 +3493,8 @@ drm_intel_bufmgr_gem_init(int fd, int batch_size)
 		/* Kernel does not supports HAS_LLC query, fallback to GPU
 		 * generation detection and assume that we have LLC on GEN6/7
 		 */
-		bufmgr_gem->has_llc = IS_GEN6(bufmgr_gem->pci_device) ||
-				      IS_GEN7(bufmgr_gem->pci_device);
+		bufmgr_gem->has_llc = IS_GEN6(bufmgr_gem->dev) ||
+				      IS_GEN7(bufmgr_gem->dev);
 	} else
 		bufmgr_gem->has_llc = *gp.value;
 

@@ -35,7 +35,7 @@
 
 #include "libdrm.h"
 #include "xf86drm.h"
-#include "intel_device.h"
+#include "intel_device_priv.h"
 #include "intel_chipset.h"
 #include "intel_bufmgr.h"
 
@@ -1277,7 +1277,7 @@ decode_3d_1d(struct drm_intel_decode *ctx)
 	const char *format, *zformat, *type;
 	uint32_t opcode;
 	uint32_t *data = ctx->data;
-	uint32_t devid = ctx->devid;
+	struct drm_intel_device *dev = ctx->dev;
 
 	struct {
 		uint32_t opcode;
@@ -1353,7 +1353,7 @@ decode_3d_1d(struct drm_intel_decode *ctx)
 		for (word = 0; word <= 8; word++) {
 			if (data[0] & (1 << (4 + word))) {
 				/* save vertex state for decode */
-				if (!IS_GEN2(devid)) {
+				if (!IS_GEN2(dev)) {
 					int tex_num;
 
 					if (word == 2) {
@@ -2029,7 +2029,7 @@ decode_3d_1d(struct drm_intel_decode *ctx)
 		}
 		return len;
 	case 0x01:
-		if (IS_GEN2(devid))
+		if (IS_GEN2(dev))
 			break;
 		instr_out(ctx, 0, "3DSTATE_SAMPLER_STATE\n");
 		instr_out(ctx, 1, "mask\n");
@@ -2254,7 +2254,7 @@ decode_3d_1d(struct drm_intel_decode *ctx)
 
 	for (idx = 0; idx < ARRAY_SIZE(opcodes_3d_1d); idx++) {
 		opcode_3d_1d = &opcodes_3d_1d[idx];
-		if (opcode_3d_1d->i830_only && !IS_GEN2(devid))
+		if (opcode_3d_1d->i830_only && !IS_GEN2(dev))
 			continue;
 
 		if (((data[0] & 0x00ff0000) >> 16) == opcode_3d_1d->opcode) {
@@ -3144,7 +3144,7 @@ decode_3d_965(struct drm_intel_decode *ctx)
 	unsigned int i, j, sba_len;
 	const char *desc1 = NULL;
 	uint32_t *data = ctx->data;
-	uint32_t devid = ctx->devid;
+	struct drm_intel_device *dev = ctx->dev;
 
 	struct {
 		uint32_t opcode;
@@ -3297,9 +3297,9 @@ decode_3d_965(struct drm_intel_decode *ctx)
 		instr_out(ctx, 0, "STATE_BASE_ADDRESS\n");
 		i++;
 
-		if (IS_GEN6(devid) || IS_GEN7(devid))
+		if (IS_GEN6(dev) || IS_GEN7(dev))
 			sba_len = 10;
-		else if (IS_GEN5(devid))
+		else if (IS_GEN5(dev))
 			sba_len = 8;
 		else
 			sba_len = 6;
@@ -3308,17 +3308,17 @@ decode_3d_965(struct drm_intel_decode *ctx)
 
 		state_base_out(ctx, i++, "general");
 		state_base_out(ctx, i++, "surface");
-		if (IS_GEN6(devid) || IS_GEN7(devid))
+		if (IS_GEN6(dev) || IS_GEN7(dev))
 			state_base_out(ctx, i++, "dynamic");
 		state_base_out(ctx, i++, "indirect");
-		if (IS_GEN5(devid) || IS_GEN6(devid) || IS_GEN7(devid))
+		if (IS_GEN5(dev) || IS_GEN6(dev) || IS_GEN7(dev))
 			state_base_out(ctx, i++, "instruction");
 
 		state_max_out(ctx, i++, "general");
-		if (IS_GEN6(devid) || IS_GEN7(devid))
+		if (IS_GEN6(dev) || IS_GEN7(dev))
 			state_max_out(ctx, i++, "dynamic");
 		state_max_out(ctx, i++, "indirect");
-		if (IS_GEN5(devid) || IS_GEN6(devid) || IS_GEN7(devid))
+		if (IS_GEN5(dev) || IS_GEN6(dev) || IS_GEN7(dev))
 			state_max_out(ctx, i++, "instruction");
 
 		return len;
@@ -3387,7 +3387,7 @@ decode_3d_965(struct drm_intel_decode *ctx)
 
 		for (i = 1; i < len;) {
 			int idx, access;
-			if (IS_GEN6(devid)) {
+			if (IS_GEN6(dev)) {
 				idx = 26;
 				access = 20;
 			} else {
@@ -3414,8 +3414,8 @@ decode_3d_965(struct drm_intel_decode *ctx)
 			instr_out(ctx, i,
 				  "buffer %d: %svalid, type 0x%04x, "
 				  "src offset 0x%04x bytes\n",
-				  data[i] >> ((IS_GEN6(devid) || IS_GEN7(devid)) ? 26 : 27),
-				  data[i] & (1 << ((IS_GEN6(devid) || IS_GEN7(devid)) ? 25 : 26)) ?
+				  data[i] >> ((IS_GEN6(dev) || IS_GEN7(dev)) ? 26 : 27),
+				  data[i] & (1 << ((IS_GEN6(dev) || IS_GEN7(dev)) ? 25 : 26)) ?
 				  "" : "in", (data[i] >> 16) & 0x1ff,
 				  data[i] & 0x07ff);
 			i++;
@@ -3599,7 +3599,7 @@ decode_3d_965(struct drm_intel_decode *ctx)
 
 	case 0x7905:
 		instr_out(ctx, 0, "3DSTATE_DEPTH_BUFFER\n");
-		if (IS_GEN5(devid) || IS_GEN6(devid))
+		if (IS_GEN5(dev) || IS_GEN6(dev))
 			instr_out(ctx, 1,
 				  "%s, %s, pitch = %d bytes, %stiled, HiZ %d, Seperate Stencil %d\n",
 				  get_965_surfacetype(data[1] >> 29),
@@ -3623,7 +3623,7 @@ decode_3d_965(struct drm_intel_decode *ctx)
 		if (len >= 6)
 			instr_out(ctx, 5, "\n");
 		if (len >= 7) {
-			if (IS_GEN6(devid))
+			if (IS_GEN6(dev))
 				instr_out(ctx, 6, "\n");
 			else
 				instr_out(ctx, 6,
@@ -3633,7 +3633,7 @@ decode_3d_965(struct drm_intel_decode *ctx)
 		return len;
 
 	case 0x7a00:
-		if (IS_GEN6(devid) || IS_GEN7(devid)) {
+		if (IS_GEN6(dev) || IS_GEN7(dev)) {
 			unsigned int i;
 			if (len != 4 && len != 5)
 				fprintf(out, "Bad count in PIPE_CONTROL\n");
@@ -3893,9 +3893,9 @@ drm_intel_decode(struct drm_intel_decode *ctx)
 {
 	int ret;
 	unsigned int index = 0;
-	uint32_t devid;
 	int size = ctx->base_count * 4;
 	void *temp;
+	struct drm_intel_device *dev = ctx->dev;
 
 	if (!ctx)
 		return;
@@ -3912,7 +3912,6 @@ drm_intel_decode(struct drm_intel_decode *ctx)
 	ctx->hw_offset = ctx->base_hw_offset;
 	ctx->count = ctx->base_count;
 
-	devid = ctx->devid;
 	head_offset = ctx->head;
 	tail_offset = ctx->tail;
 	out = ctx->out;
@@ -3951,7 +3950,7 @@ drm_intel_decode(struct drm_intel_decode *ctx)
 		case 0x3:
 			if (ctx->dev->gen >= 4)
 				index += decode_3d_965(ctx);
-			else if (IS_GEN3(devid))
+			else if (IS_GEN3(dev))
 				index += decode_3d(ctx);
 			else
 				index += decode_3d_i830(ctx);

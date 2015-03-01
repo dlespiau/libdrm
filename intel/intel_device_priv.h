@@ -31,5 +31,13 @@
  * header, hence a _priv.h one for internal use.
  */
 #define IS_CHIP(dev, id)	((dev)->chip == DRM_INTEL_CHIP_ ## id)
+#define IS_GEN2(dev)		((dev)->gen == 2)
+#define IS_GEN3(dev)		((dev)->gen == 3)
+#define IS_GEN4(dev)		((dev)->gen == 4)
+#define IS_GEN5(dev)		((dev)->gen == 5)
+#define IS_GEN6(dev)		((dev)->gen == 6)
+#define IS_GEN7(dev)		((dev)->gen == 7)
+#define IS_GEN8(dev)		((dev)->gen == 8)
+#define IS_GEN9(dev)		((dev)->gen == 9)
 
 #endif /* __INTEL_DEVICE_PRIV_H__ */

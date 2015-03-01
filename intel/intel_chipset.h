@@ -354,13 +354,4 @@
 
 #define IS_GEN9(devid)		IS_SKYLAKE(devid)
 
-#define IS_9XX(dev)		(IS_GEN3(dev) || \
-				 IS_GEN4(dev) || \
-				 IS_GEN5(dev) || \
-				 IS_GEN6(dev) || \
-				 IS_GEN7(dev) || \
-				 IS_GEN8(dev) || \
-				 IS_GEN9(dev))
-
-
 #endif /* _INTEL_CHIPSET_H */

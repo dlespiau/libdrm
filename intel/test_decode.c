@@ -182,6 +182,11 @@ main(int argc, char **argv)
 	devid = infer_devid(argv[1]);
 
 	ctx = drm_intel_decode_context_alloc(devid);
+	if (!ctx) {
+		fprintf(stderr, "Couldn't create decode context for 0x%04x\n",
+			devid);
+		exit(1);
+	}
 
 	if (argc == 3) {
 		if (strcmp(argv[2], "-dump") == 0)

@@ -7,6 +7,7 @@ LIBDRM_INTEL_FILES := \
 	intel_decode.c \
 	intel_device.c \
 	intel_device.h \
+	intel_device_priv.h \
 	intel_chipset.h \
 	mm.c \
 	mm.h

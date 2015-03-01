@@ -60,7 +60,7 @@
 #include "libdrm_lists.h"
 #include "intel_bufmgr.h"
 #include "intel_bufmgr_priv.h"
-#include "intel_device.h"
+#include "intel_device_priv.h"
 #include "intel_chipset.h"
 #include "intel_aub.h"
 #include "string.h"
@@ -338,7 +338,7 @@ drm_intel_gem_bo_tile_pitch(drm_intel_bufmgr_gem *bufmgr_gem,
 		return ALIGN(pitch, 64);
 
 	if (*tiling_mode == I915_TILING_X
-			|| (IS_915(bufmgr_gem->pci_device)
+			|| (IS_CHIP(bufmgr_gem->dev, I915)
 			    && *tiling_mode == I915_TILING_Y))
 		tile_width = 512;
 	else
@@ -843,7 +843,7 @@ drm_intel_gem_bo_alloc_tiled(drm_intel_bufmgr *bufmgr, const char *name,
 		if ((bufmgr_gem->gen == 2) && tiling != I915_TILING_NONE)
 			height_alignment = 16;
 		else if (tiling == I915_TILING_X
-			|| (IS_915(bufmgr_gem->pci_device)
+			|| (IS_CHIP(bufmgr_gem->dev, I915)
 			    && tiling == I915_TILING_Y))
 			height_alignment = 8;
 		else if (tiling == I915_TILING_Y)

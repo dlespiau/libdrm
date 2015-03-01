@@ -35,6 +35,7 @@
 
 #include "libdrm.h"
 #include "xf86drm.h"
+#include "intel_device.h"
 #include "intel_chipset.h"
 #include "intel_bufmgr.h"
 
@@ -42,6 +43,9 @@
 struct drm_intel_decode {
 	/** stdio file where the output should land.  Defaults to stdout. */
 	FILE *out;
+
+	/** Description of the GPU */
+	struct drm_intel_device *dev;
 
 	/** PCI device ID. */
 	uint32_t devid;
@@ -3826,27 +3830,15 @@ drm_intel_decode_context_alloc(uint32_t devid)
 	if (!ctx)
 		return NULL;
 
+	ctx->dev = drm_intel_device_new_from_devid(devid);
+	if (!ctx->dev) {
+		free(ctx);
+		return NULL;
+	}
+
 	ctx->devid = devid;
 	ctx->out = stdout;
-
-	if (IS_GEN9(devid))
-		ctx->gen = 9;
-	else if (IS_GEN8(devid))
-		ctx->gen = 8;
-	else if (IS_GEN7(devid))
-		ctx->gen = 7;
-	else if (IS_GEN6(devid))
-		ctx->gen = 6;
-	else if (IS_GEN5(devid))
-		ctx->gen = 5;
-	else if (IS_GEN4(devid))
-		ctx->gen = 4;
-	else if (IS_9XX(devid))
-		ctx->gen = 3;
-	else {
-		assert(IS_GEN2(devid));
-		ctx->gen = 2;
-	}
+	ctx->gen = ctx->dev->gen;
 
 	return ctx;
 }
@@ -3854,6 +3846,7 @@ drm_intel_decode_context_alloc(uint32_t devid)
 drm_public void
 drm_intel_decode_context_free(struct drm_intel_decode *ctx)
 {
+	drm_intel_device_free(ctx->dev);
 	free(ctx);
 }
 
